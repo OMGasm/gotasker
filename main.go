@@ -4,7 +4,6 @@ import (
 	_ "database/sql"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -13,17 +12,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func createLogger() (*slog.Logger, *log.Logger) {
+func createLogger() *slog.Logger {
 	file, err := os.OpenFile("log.log", os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 	stdout := os.Stdout
-	sink := io.MultiWriter(file, stdout)
+	sink := io.MultiWriter(stdout, file)
 	handler := slog.NewJSONHandler(sink, nil)
 	logger := slog.New(handler)
-	basicLogger := slog.NewLogLogger(handler, slog.LevelInfo)
-	return logger, basicLogger
+	return logger
 }
 
 func defaultHandler(response http.ResponseWriter, request *http.Request) {
@@ -36,10 +34,10 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	logger, basicLogger := createLogger()
+	logger := createLogger()
 	slog.SetDefault(logger)
 
 	http.HandleFunc("/", defaultHandler)
 
-	basicLogger.Fatal(http.ListenAndServe(":8080", nil))
+	logger.Error("HTTP server has crashed", http.ListenAndServe(":8080", nil))
 }
