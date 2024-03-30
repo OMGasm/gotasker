@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "database/sql"
-	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -24,20 +23,33 @@ func createLogger() *slog.Logger {
 	return logger
 }
 
-func defaultHandler(response http.ResponseWriter, request *http.Request) {
-	if request.URL.Path != "/" {
-		response.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(response, "Not Found")
+func defaultHandler(res http.ResponseWriter, req *http.Request) {
+	if req.URL.Path != "/" {
+		slog.Info("Not found", "method", req.Method, "path", req.URL.Path)
+		err := e404(req.URL.Path)
+		res.WriteHeader(http.StatusNotFound)
+		err.Render(req.Context(), res)
 		return
 	}
-	fmt.Fprint(response, "hello world")
+	index := index()
+	index.Render(req.Context(), res)
+}
+
+func logHTTP(handler http.HandlerFunc) http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		slog.Info("request", "method", req.Method, "path", req.URL.Path)
+		handler(res, req)
+	}
 }
 
 func main() {
+	host, port := "127.0.0.1", "8080"
+
 	logger := createLogger()
 	slog.SetDefault(logger)
+	http.HandleFunc("/", logHTTP(defaultHandler))
 
-	http.HandleFunc("/", defaultHandler)
-
+	addr := host + ":" + port
+	logger.Info("Starting HTTP server on " + addr)
 	logger.Error("HTTP server has crashed", http.ListenAndServe(":8080", nil))
 }
