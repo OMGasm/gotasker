@@ -21,3 +21,6 @@
 go.work
 
 *.log
+
+# templ generate output
+*_templ.go
