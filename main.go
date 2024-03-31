@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aue.io/tasker/templates"
 	_ "database/sql"
 	"log/slog"
 	"net/http"
@@ -12,12 +13,12 @@ import (
 func defaultHandler(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		slog.Info("Not found", "method", req.Method, "path", req.URL.Path)
-		err := e404(req.URL.Path)
+		err := templates.E404(req.URL.Path)
 		res.WriteHeader(http.StatusNotFound)
 		err.Render(req.Context(), res)
 		return
 	}
-	index := index()
+	index := templates.Index()
 	index.Render(req.Context(), res)
 }
 
