@@ -11,10 +11,7 @@ var tasks []Task
 
 func defaultHandler(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
-		slog.Info("Not found", "method", req.Method, "path", req.URL.Path)
-		err := templates.E404(req.URL.Path)
-		res.WriteHeader(http.StatusNotFound)
-		err.Render(req.Context(), res)
+		notFound(res, req)
 		return
 	}
 	index := templates.Index(tasks)
@@ -38,4 +35,11 @@ func RegisterHandlers(logger *slog.Logger) {
 	for path, handler := range handlers {
 		http.HandleFunc(path, logHTTP(logger, handler))
 	}
+}
+
+func notFound(res http.ResponseWriter, req *http.Request) {
+	slog.Info("Not found", "method", req.Method, "path", req.URL.Path)
+	err := templates.E404(req.URL.Path)
+	res.WriteHeader(http.StatusNotFound)
+	err.Render(req.Context(), res)
 }
