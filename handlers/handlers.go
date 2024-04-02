@@ -1,15 +1,11 @@
-package main
+package handlers
 
 import (
+	. "aue.io/tasker/tasks"
 	"aue.io/tasker/templates"
 	"log/slog"
 	"net/http"
 )
-
-type Task struct {
-	title string
-	date  string
-}
 
 var tasks []Task
 
@@ -32,9 +28,9 @@ func logHTTP(logger *slog.Logger, handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func registerHandlers(logger *slog.Logger) {
+func RegisterHandlers(logger *slog.Logger) {
 	//TODO: do actual task stuff, in a better place
-	tasks = append(tasks, Task{"A task to foo", "2024-04-02 21:06"})
+	tasks = append(tasks, NewTask("A task to foo", "2024-04-02 21:06"))
 
 	handlers := map[string]http.HandlerFunc{
 		"/": defaultHandler,

@@ -1,6 +1,8 @@
 package main
 
 import (
+	. "aue.io/tasker/handlers"
+	. "aue.io/tasker/logging"
 	_ "database/sql"
 	"log/slog"
 	"net/http"
@@ -12,10 +14,10 @@ import (
 func main() {
 	host, port := "127.0.0.1", "8080"
 
-	logger := createLogger()
+	logger := CreateLogger()
 	slog.SetDefault(logger)
 	logHTTP := logger.WithGroup("HTTP")
-	registerHandlers(logHTTP)
+	RegisterHandlers(logHTTP)
 
 	addr := host + ":" + port
 	logHTTP.Info("Starting server on " + addr)

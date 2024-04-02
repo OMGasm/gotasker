@@ -1,4 +1,4 @@
-package main
+package logging
 
 import (
 	"io"
@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func createLogger() *slog.Logger {
+func CreateLogger() *slog.Logger {
 	file, err := os.OpenFile("log.log", os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
