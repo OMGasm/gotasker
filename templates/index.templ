@@ -1,5 +1,10 @@
 package templates
 
-templ Index() {
+templ Index(tasks []Task) {
   <div>hi!</div>
+  <table>
+    for _, task := range tasks {
+      <tr><td>{task.title}</td><td>{task.date}</td></tr>
+    }
+  </table>
 }
