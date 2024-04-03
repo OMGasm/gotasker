@@ -77,9 +77,9 @@ func insertTask(res http.ResponseWriter, req *http.Request) {
 
 func deleteTask(res http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodDelete || req.Method == http.MethodPost {
-		id, err := strconv.ParseInt(req.URL.Query().Get("id"), 10, 0)
+		id, err := strconv.ParseInt(req.PostFormValue("id"), 10, 0)
 		if err != nil {
-			slog.Warn("Invalid task id?", "Query id", req.URL.Query().Get("id"))
+			slog.Warn("Invalid task id?", "Form task id", req.PostFormValue("id"))
 			res.WriteHeader(http.StatusBadRequest)
 			errPage := templates.Invalid("bad id?")
 			errPage.Render(req.Context(), res)

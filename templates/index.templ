@@ -12,7 +12,12 @@ templ Index(tasks []Task) {
       <tr>
         <td>{task.Title}</td>
         <td>{task.Date}</td>
-        <td><a href={templ.URL(fmt.Sprintf("/delete?id=%d", task.Id))}>[X]</a></td>
+        <td>
+          <form method="POST" action="/delete">
+            <input name="id" value={fmt.Sprintf("%d", task.Id)} hidden></input>
+            <input type="submit" value="[Delete]"></input>
+          </form>
+        </td>
       </tr>
     }
   </table>
