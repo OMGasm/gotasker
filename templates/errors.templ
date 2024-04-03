@@ -8,3 +8,9 @@ templ E404(path string) {
     <a href="javascript:history.back()">Click here</a> to go back, <a href="/">or here</a> to go back to the main page
   </div>
 }
+
+templ Invalid(msg string) {
+  <div>
+    Invalid request, {msg}
+  </div>
+}

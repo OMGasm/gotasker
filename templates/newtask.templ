@@ -1,0 +1,11 @@
+package templates
+
+templ Create(isForm bool) {
+  <form id="newtask" if isForm { method="POST" action="/insert" } >
+    <label for="title">Task title</label>
+    <input name="title"></input>
+    <label for="date">Due date</label>
+    <input name="date" placeholder="yyyy/mm/dd hh:mm"></input>
+    <input type="submit" value="Submit"></input>
+  </form>
+}

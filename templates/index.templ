@@ -1,11 +1,19 @@
 package templates
-import . "aue.io/tasker/tasks"
+import (
+  . "aue.io/tasker/tasks"
+  "fmt"
+)
 
 templ Index(tasks []Task) {
   <div>hi!</div>
+  @Create(true)
   <table>
     for _, task := range tasks {
-      <tr><td>{task.Title()}</td><td>{task.Date()}</td></tr>
+      <tr>
+        <td>{task.Title}</td>
+        <td>{task.Date}</td>
+        <td><a href={templ.URL(fmt.Sprintf("/delete?id=%d", task.Id))}>[X]</a></td>
+      </tr>
     }
   </table>
 }
