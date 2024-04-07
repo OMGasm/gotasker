@@ -1,0 +1,23 @@
+package templates
+
+import (
+  . "aue.io/tasker/tasks"
+  "fmt"
+)
+
+templ taskTable(tasks []Task) {
+  <table>
+    for _, task := range tasks {
+      <tr>
+        <td>{task.Title}</td>
+        <td>{task.Date}</td>
+        <td>
+          <form method="POST" action="/delete">
+            <input name="id" value={fmt.Sprintf("%d", task.Id)} hidden></input>
+            <input type="submit" value="[Delete]"></input>
+          </form>
+        </td>
+      </tr>
+    }
+  </table>
+}
