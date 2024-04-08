@@ -28,7 +28,7 @@ func RegisterHandlers(logger *slog.Logger) {
 	http.Handle("GET /", http.FileServer(http.Dir("./public")))
 	http.HandleFunc("GET /{$}", log(indexPage))
 	http.HandleFunc("GET /tasks", log(taskList))
-	http.HandleFunc("POST /delete", log(deleteTask))
+	http.HandleFunc("DELETE /delete/{id}", log(deleteTask))
 	http.HandleFunc("POST /insert", log(insertTask))
 	http.HandleFunc("GET /insert", log(insertTask_get))
 }
@@ -72,14 +72,14 @@ func insertTask(res http.ResponseWriter, req *http.Request) {
 }
 
 func deleteTask(res http.ResponseWriter, req *http.Request) {
-	id, err := strconv.ParseInt(req.PostFormValue("id"), 10, 0)
+	id, err := strconv.ParseInt(req.PathValue("id"), 10, 0)
 	if err != nil {
-		slog.Warn("Invalid task id?", "Form task id", req.PostFormValue("id"))
+		slog.Warn("Invalid task id?", "Task id", req.PathValue("id"))
 		res.WriteHeader(http.StatusBadRequest)
 		errPage := templates.Invalid("bad id?")
 		errPage.Render(req.Context(), res)
 		return
 	}
 	db.DeleteTask(int(id))
-	http.Redirect(res, req, "/", http.StatusFound)
+	res.WriteHeader(http.StatusOK)
 }

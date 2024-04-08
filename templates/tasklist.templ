@@ -7,17 +7,20 @@ import (
 
 templ TaskList(tasks []Task) {
   <table>
+    <thead>
+      <th>Task title</th>
+      <th>Due date</th>
+    </thead>
+    <tbody hx-confirm="Are you sure?" hx-target="closest tr" hx-swap="outerHTML swap:0.5s">
     for _, task := range tasks {
       <tr>
-        <td>{task.Title}</td>
-        <td>{task.Date}</td>
+        <td>{ task.Title }</td>
+        <td>{ task.Date }</td>
         <td>
-          <form method="POST" action="/delete">
-            <input name="id" value={fmt.Sprintf("%d", task.Id)} hidden></input>
-            <input type="submit" value="[Delete]"></input>
-          </form>
+          <button hx-delete={ fmt.Sprintf("/delete/%d", task.Id) }>[Delete]</button>
         </td>
       </tr>
     }
+    </tbody>
   </table>
 }
