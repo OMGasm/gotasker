@@ -1,0 +1,12 @@
+package templates
+import (
+  . "aue.io/tasker/tasks"
+)
+
+templ Index(tasks []Task) {
+  @main("Task manager?") {
+    <div>hi!</div>
+    @Create(true)
+    @TaskList(tasks)
+  }
+}

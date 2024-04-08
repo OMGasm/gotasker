@@ -25,7 +25,8 @@ func RegisterHandlers(logger *slog.Logger) {
 	db = NewDB()
 	log := logHTTP(logger)
 
-	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.Handle("GET /", http.FileServer(http.Dir("./public")))
+	http.HandleFunc("GET /{$}", log(indexPage))
 	http.HandleFunc("GET /tasks", log(taskList))
 	http.HandleFunc("POST /delete", log(deleteTask))
 	http.HandleFunc("POST /insert", log(insertTask))
@@ -37,6 +38,11 @@ func notFound(reason string, res http.ResponseWriter, req *http.Request) {
 	err := templates.E404(req.URL.Path)
 	res.WriteHeader(http.StatusNotFound)
 	err.Render(req.Context(), res)
+}
+
+func indexPage(res http.ResponseWriter, req *http.Request) {
+	index := templates.Index(db.AllTasks())
+	index.Render(req.Context(), res)
 }
 
 func taskList(res http.ResponseWriter, req *http.Request) {
