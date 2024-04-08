@@ -21,25 +21,23 @@ func defaultHandler(res http.ResponseWriter, req *http.Request) {
 	index.Render(req.Context(), res)
 }
 
-func logHTTP(logger *slog.Logger, handler http.HandlerFunc) http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		logger.Info("request", "method", req.Method, "path", req.URL.Path)
-		handler(res, req)
+func logHTTP(logger *slog.Logger) func(http.HandlerFunc) http.HandlerFunc {
+	return func(handler http.HandlerFunc) http.HandlerFunc {
+		return func(res http.ResponseWriter, req *http.Request) {
+			logger.Info("request", "method", req.Method, "path", req.URL.Path)
+			handler(res, req)
+		}
 	}
 }
 
 func RegisterHandlers(logger *slog.Logger) {
 	db = NewDB()
+	log := logHTTP(logger)
 
-	handlers := map[string]http.HandlerFunc{
-		"/":            defaultHandler,
-		"POST /delete": deleteTask,
-		"POST /insert": insertTask,
-		"GET /insert":  insertTask_get,
-	}
-	for path, handler := range handlers {
-		http.HandleFunc(path, logHTTP(logger, handler))
-	}
+	http.HandleFunc("/", log(defaultHandler))
+	http.HandleFunc("POST /delete", log(deleteTask))
+	http.HandleFunc("POST /insert", log(insertTask))
+	http.HandleFunc("GET /insert", log(insertTask_get))
 }
 
 func notFound(reason string, res http.ResponseWriter, req *http.Request) {
