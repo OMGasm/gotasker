@@ -12,15 +12,6 @@ import (
 
 var db *TaskDB
 
-func defaultHandler(res http.ResponseWriter, req *http.Request) {
-	if req.URL.Path != "/" {
-		notFound("Not found", res, req)
-		return
-	}
-	index := templates.Index(db.AllTasks())
-	index.Render(req.Context(), res)
-}
-
 func logHTTP(logger *slog.Logger) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handler http.HandlerFunc) http.HandlerFunc {
 		return func(res http.ResponseWriter, req *http.Request) {
@@ -34,7 +25,8 @@ func RegisterHandlers(logger *slog.Logger) {
 	db = NewDB()
 	log := logHTTP(logger)
 
-	http.HandleFunc("/", log(defaultHandler))
+	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.HandleFunc("GET /tasks", log(taskList))
 	http.HandleFunc("POST /delete", log(deleteTask))
 	http.HandleFunc("POST /insert", log(insertTask))
 	http.HandleFunc("GET /insert", log(insertTask_get))
@@ -45,6 +37,11 @@ func notFound(reason string, res http.ResponseWriter, req *http.Request) {
 	err := templates.E404(req.URL.Path)
 	res.WriteHeader(http.StatusNotFound)
 	err.Render(req.Context(), res)
+}
+
+func taskList(res http.ResponseWriter, req *http.Request) {
+	taskList := templates.TaskList(db.AllTasks())
+	taskList.Render(req.Context(), res)
 }
 
 func insertTask_get(res http.ResponseWriter, req *http.Request) {
