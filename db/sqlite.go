@@ -2,7 +2,7 @@ package db
 
 import (
 	. "aue.io/tasker/tasks"
-	"database/sql"
+	// "database/sql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"log/slog"
@@ -37,19 +37,15 @@ func (self SqliteDB) Close() {
 
 // a limit of 0 returns all found tasks
 func (self SqliteDB) GetTasks(limit int) (tasks []Task, err error) {
-	var rows *sql.Rows
-	query := "SELECT id, title, date FROM tasks"
-	if limit <= 0 {
-		rows, err = self.db.Query(query)
-	} else {
-		rows, err = self.db.Query(query+" LIMIT ?", limit)
-	}
 	tasks = []Task{}
-	for rows.Next() {
-		var task Task
-		rows.Scan(&task.Id, &task.Title, &task.Date)
-		tasks = append(tasks, task)
+	query := "SELECT id, title, date FROM tasks"
+
+	if limit <= 0 {
+		err = self.db.Select(&tasks, query)
+	} else {
+		err = self.db.Select(&tasks, query+" LIMIT ?", limit)
 	}
+
 	return tasks, err
 }
 
