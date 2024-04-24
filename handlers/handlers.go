@@ -10,7 +10,8 @@ import (
 	"aue.io/tasker/templates"
 )
 
-var db *TaskDB
+var db DB
+var log *slog.Logger
 
 func logHTTP(logger *slog.Logger) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handler http.HandlerFunc) http.HandlerFunc {
@@ -21,9 +22,13 @@ func logHTTP(logger *slog.Logger) func(http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func RegisterHandlers(logger *slog.Logger) {
-	db = NewDB()
-	log := logHTTP(logger)
+func InitHandlers(logger *slog.Logger, database DB) {
+	log = logger
+	db = database
+}
+
+func RegisterHandlers() {
+	log := logHTTP(log)
 
 	http.Handle("GET /", http.FileServer(http.Dir("./public")))
 	http.HandleFunc("GET /{$}", log(indexPage))
@@ -41,12 +46,20 @@ func notFound(reason string, res http.ResponseWriter, req *http.Request) {
 }
 
 func indexPage(res http.ResponseWriter, req *http.Request) {
-	index := templates.Index(db.AllTasks())
+	tasks, err := db.GetTasks(0)
+	if err != nil {
+		templates.E404("db error?" + err.Error())
+	}
+	index := templates.Index(tasks)
 	index.Render(req.Context(), res)
 }
 
 func taskList(res http.ResponseWriter, req *http.Request) {
-	taskList := templates.TaskList(db.AllTasks())
+	tasks, err := db.GetTasks(0)
+	if err != nil {
+		templates.E404("db error?")
+	}
+	taskList := templates.TaskList(tasks)
 	taskList.Render(req.Context(), res)
 }
 

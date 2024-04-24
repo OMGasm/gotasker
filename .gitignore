@@ -24,3 +24,6 @@ go.work
 
 # templ generate output
 *_templ.go
+
+# databases?
+*.db
